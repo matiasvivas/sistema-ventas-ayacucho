@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="master">
+<script type="text/javascript" src="jquery-3.3.1.js"></script>
+<body onload="checkMontoPolloFiambreOtros()" style="padding-top: 0px;">
+<main layout:fragment="contenido">
+    <div class="col-12">
+        <h2>Vender</h2>
+        <div th:classappend="'alert-' + (${clase != null} ? ${clase} : info)" th:if="${mensaje != null}"
+             th:text="${mensaje}"
+             class="alert">
+        </div>
+        <form id="form-agregarproducto" th:object="${producto}" th:action="@{/vender/agregarProductos}" method="post">
+
+            <input hidden autofocus autocomplete="off" th:field="*{precio}" id="subtotalPolloRefresh" name="subtotalPolloRefresh"
+                   type="number"
+                   class="form-control">
+
+            <input hidden autofocus autocomplete="off" th:field="*{existencia}" id="subtotalFiambreRefresh" name="subtotalPolloRefresh"
+                   type="number"
+                   class="form-control">
+
+            <input hidden autofocus autocomplete="off" th:field="*{nombre}" id="subtotalOtrosRefresh" name="subtotalPolloRefresh"
+                   type="text"
+                   class="form-control">
+
+            <div hidden id="precioRecibidoBackend" th:text="${precioBackend}"></div>
+            <div hidden id="existenciaRecibidoBackend" th:text="${existenciaBackend}"></div>
+            <div hidden id="nombreRecibidoBackend" th:text="${nombreBackend}"></div>
+
+            <script>
+            function checkMontoPolloFiambreOtros(){
+            var montoPR = document.getElementById("precioRecibidoBackend").innerText;
+            var montoFR = document.getElementById("existenciaRecibidoBackend").innerText;
+            var montoOR = document.getElementById("nombreRecibidoBackend").innerText;
+            if(montoPR!=""&&montoPR!=0){
+                document.getElementById("subtotalPollo").value=montoPR;
+                montoPollo();
+                }
+            if(montoFR!=""&&montoFR!=0){
+                document.getElementById("subtotalFiambre").value=montoFR;
+                montoFiambre();
+                }
+            if(montoOR!=""&&montoOR!=0){
+                document.getElementById("subtotalOtros").value=montoOR;
+                montoOtros();
+                }
+            }
+
+                function persistirMontosDeAbajo(){
+                document.getElementById("subtotalPolloRefresh").value=document.getElementById("subtotalPollo").value;
+                document.getElementById("subtotalFiambreRefresh").value=document.getElementById("subtotalFiambre").value;
+                document.getElementById("subtotalOtrosRefresh").value=document.getElementById("subtotalOtros").value;
+                document.getElementById("form-agregarproducto").submit();
+                }
+
+                function aumentarProducto(codigoProducto){
+                alert(codigoProducto);
+                }
+            </script>
+
+            <div class="form-group">
+                <label for="codigo">Código de barras</label>
+                <input autofocus autocomplete="off" th:field="*{codigo}" id="codigo"
+                       placeholder="Escanea el código o escríbelo y presiona Enter"
+                       type="text"
+                       class="form-control" th:classappend="${#fields.hasErrors('codigo')} ? 'is-invalid' : ''"
+                onchange="persistirMontosDeAbajo()">
+                <div class="invalid-feedback" th:errors="*{codigo}"></div>
+            </div>
+        </form>
+
+        <!-- Iba aca Cobrar y despues total-->
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th style="text-align:center;">Quitar de lista</th>
+                    <th style="text-align:center;">Sumar uno</th>
+                    <th style="text-align:center;">Restar uno</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto, iterador : ${session.carrito}">
+                    <td th:text="${producto.nombre}"></td>
+                    <td id="codigoSeleccionado" th:text="${producto.codigo}"></td>
+                    <td th:text="${producto.precio}"></td>
+                    <td th:text="${producto.cantidad}"></td>
+                    <td th:text="${producto.total}"></td>
+                    <td style="text-align:center;">
+                                <form th:action="@{/vender/quitar/} + ${iterador.index}" method="post">
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                </form>
+                    </td>
+                    <td style="text-align:center;">
+                        <form th:action="@{/vender/aumentarUnProducto/} + ${iterador.index}" method="post">
+                            <button type="submit" class="btn btn-success">+</button>
+                        </form>
+                    </td>
+                    <td style="text-align:center;">
+                        <form th:action="@{/vender/disminuirUnProducto/} + ${iterador.index}" method="post">
+                            <button type="submit" class="btn btn-success">-</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+        <div class="form-group">
+            <label for="codigo">Otras Ventas:</label>
+
+            <script>
+            var subtotalPollo=0;
+            var subtotalFiambre=0;
+            var subtotalOtros=0;
+            var oculto=0;
+            var mostrar=0;
+
+                function montoPollo(){
+subtotalPollo = parseFloat(document.getElementById("subtotalPollo").value);
+if (isNaN(subtotalPollo)) subtotalPollo = 0;
+oculto = parseFloat(document.getElementById("oculto").innerHTML);
+mostrar = document.getElementById("mostrar").innerHTML="Total: "+parseFloat(subtotalFiambre+subtotalPollo+subtotalOtros+oculto);
+}
+
+                function montoFiambre(){
+subtotalFiambre = parseFloat(document.getElementById("subtotalFiambre").value);
+if (isNaN(subtotalFiambre)) subtotalFiambre = 0;
+oculto = parseFloat(document.getElementById("oculto").innerHTML);
+mostrar = document.getElementById("mostrar").innerHTML="Total: "+parseFloat(subtotalFiambre+subtotalPollo+subtotalOtros+oculto);
+}
+
+                function montoOtros(){
+subtotalOtros = parseFloat(document.getElementById("subtotalOtros").value);
+if (isNaN(subtotalOtros)) subtotalOtros = 0;
+oculto = parseFloat(document.getElementById("oculto").innerHTML);
+mostrar = document.getElementById("mostrar").innerHTML="Total: "+parseFloat(subtotalFiambre+subtotalPollo+subtotalOtros+oculto);
+}
+
+
+                function cobrarEfectivo(){
+                /*var dineroCaja = document.getElementById("dineroCaja").value;
+                var dineroDigital = document.getElementById("dineroDigital").value;
+                var clienteCtaCte = document.getElementById("clienteCtaCte").value;
+                var dineroCtaCte = document.getElementById("dineroCtaCte").value;
+                var concatMedioDePago = dineroCaja+";"+dineroDigital+";"+dineroCtaCte+","+clienteCtaCte;
+                alert(concatMedioDePago);
+                document.getElementById("concatMedioDePago").value=concatMedioDePago;*/
+
+                    document.getElementById("venderForm").submit();
+                }
+
+                function activarCuentaCorriente(){
+                    document.getElementById("dineroCtaCte").disabled=false;
+                }
+            </script>
+
+        </div>
+
+        <form id="venderForm" th:object="${producto}" class="mb-2" th:action="@{/vender/cobrar/}+${precio}" method="post">
+            <input hidden class="form-control" type="text" id="concatMedioDePago" name="concatMedioDePago" th:field="*{nombre}"/>
+            <br>
+            <input class="form-control"
+                   type="number"
+                   placeholder="Monto Polleria"
+                   id="subtotalPollo"
+                   name="subtotalPollo"
+                   th:field="*{precio}"
+                   onchange="montoPollo()" />
+            <br>
+            <input class="form-control"
+                   type="number"
+                   placeholder="Monto Fiambres y Quesos"
+                   id="subtotalFiambre"
+                   name="subtotalFiambre"
+                   th:field="*{existencia}"
+                   onchange="montoFiambre()" />
+            <br>
+            <input class="form-control"
+                   type="number"
+                   placeholder="Monto Otros"
+                   id="subtotalOtros"
+                   name="subtotalOtros"
+                   th:field="*{codigo}"
+                   onchange="montoOtros()" />
+            <br>
+            <br>
+
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">Cobrar <i class="fa fa-check"></i></button>
+            </button>
+            <a th:href="@{/vender/limpiar}" class="btn btn-danger">Cancelar venta <i class="fa fa-trash"></i>
+            </a>
+        </form>
+
+        <h1 id="oculto" hidden th:text="${total}"></h1>
+        <h1 id="mostrar" th:text="${'Total: '+ total}"></h1>
+        <br>
+
+
+
+    </div>
+
+
+    <div class="container">
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="display:none;">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Medio de Pago</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <!--<p>Dinero en efectivo: </p>
+                        <input class="form-control"
+                               type="text"
+                               placeholder="Ingrese el monto"
+                               id="dineroCaja"
+                               name="dineroCaja"/>
+                        <br>
+
+                        <p>Dinero digital: </p>
+                        <input class="form-control"
+                               type="number"
+                               placeholder="Ingrese el monto"
+                               id="dineroDigital"
+                               name="dineroDigital"/>
+                        <br>
+
+                        <p>Dinero a cuenta corriente: </p>
+                        <select id="clienteCtaCte" class="form-select" aria-label="Default select example" onchange="activarCuentaCorriente()">
+                            <option selected>Seleccione el cliente</option>
+                            <option value="1">Nestor y Yamila Nanni</option>
+                            <option value="2">Mauricio Godoy</option>
+                            <option value="3">Maria Irusta</option>
+                            <option value="4">Adrian Ramirez</option>
+                            <option value="5">Mingo</option>
+                            <option value="6">Lili y Magui</option>
+                            <option value="7">Adrian Ramirez</option>
+                            <option value="8">Malboro</option>
+                        </select>
+                        <br>
+                        <br>
+                        <input disabled class="form-control"
+                               type="number"
+                               placeholder="Ingrese el monto"
+                               id="dineroCtaCte"
+                               name="dineroCtaCte"/>
+-->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" onclick="cobrarEfectivo()">Cobrar Venta <i class="fa fa-check"></i>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</main>
+</body>
+</html>
