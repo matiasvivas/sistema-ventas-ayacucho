@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="master">
+<body style="padding-top: 0px;">
+<main layout:fragment="contenido">
+    <div class="col-12">
+        <div th:classappend="'alert-' + (${clase != null} ? ${clase} : info)" th:if="${mensaje != null}"
+             th:text="${mensaje}"
+             class="alert">
+        </div>
+        <script>
+            var total = 0;
+            var subtotal1000 = 0;
+            var subtotal500 = 0;
+            var subtotal200 = 0;
+            var subtotal100 = 0;
+            var subtotal50 = 0;
+            var subtotal20 = 0;
+            var subtotal10 = 0;
+
+            function recalcularTotal1000(){
+                var cant1000 = document.getElementById("cant1000").value;
+                var billetes1000 = 1000*parseFloat(cant1000);
+                subtotal1000=billetes1000;
+                recalcularTotal();
+            }
+
+            function recalcularTotal500(){
+                var cant500 = document.getElementById("cant500").value;
+                var billetes500 = 500*parseFloat(cant500);
+                subtotal500=billetes500;
+                recalcularTotal();
+            }
+
+            function recalcularTotal200(){
+                var cant200 = document.getElementById("cant200").value;
+                var billetes200 = 200*parseFloat(cant200);
+                subtotal200=billetes200;
+                recalcularTotal();
+            }
+
+            function recalcularTotal100(){
+                var cant100 = document.getElementById("cant100").value;
+                var billetes100 = 100*parseFloat(cant100);
+                subtotal100=billetes100;
+                recalcularTotal();
+            }
+
+            function recalcularTotal50(){
+                var cant50 = document.getElementById("cant50").value;
+                var billetes50 = 50*parseFloat(cant50);
+                subtotal50=billetes50;
+                recalcularTotal();
+            }
+
+            function recalcularTotal20(){
+                var cant20 = document.getElementById("cant20").value;
+                var billetes20 = 20*parseFloat(cant20);
+                subtotal20=billetes20;
+                recalcularTotal();
+            }
+
+            function recalcularTotal10(){
+                var cant10 = document.getElementById("cant10").value;
+                var billetes10 = 10*parseFloat(cant10);
+                subtotal10=billetes10;
+                recalcularTotal();
+            }
+
+            function recalcularTotal(){
+                var total=parseFloat(subtotal1000)+parseFloat(subtotal500)+parseFloat(subtotal200)+parseFloat(subtotal100)+parseFloat(subtotal50)+parseFloat(subtotal20)+parseFloat(subtotal10);
+                if (isNaN(total)) total = 0;
+                document.getElementById("total").innerText = "Total de caja $ "+total;
+                document.getElementById("idMonto").value=total;
+            }
+
+        </script>
+        <h2>Cierre de Caja</h2>
+
+        <form th:object="${cierreCaja}" th:action="@{/cierrecajapublico/agregar}" method="get">
+            <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Billetes $1000</th>
+                    <th>Billetes $500</th>
+                    <th>Billetes $200</th>
+                    <th>Billetes $100</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><input id="cant1000" placeholder="Ingrese cantidad" onchange="recalcularTotal1000()"></td>
+                    <td><input id="cant500" placeholder="Ingrese cantidad" onchange="recalcularTotal500()"></td>
+                    <td><input id="cant200" placeholder="Ingrese cantidad" onchange="recalcularTotal200()"></td>
+                    <td><input id="cant100" placeholder="Ingrese cantidad" onchange="recalcularTotal100()"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Billetes $50</th>
+                    <th>Billetes $20</th>
+                    <th>Billetes $10</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><input id="cant50" placeholder="Ingrese cantidad" onchange="recalcularTotal50()"></td>
+                    <td><input id="cant20" placeholder="Ingrese cantidad" onchange="recalcularTotal20()"></td>
+                    <td><input id="cant10" placeholder="Ingrese cantidad" onchange="recalcularTotal10()"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+            <br>
+            <br>
+            <h3 id="total">Total de caja $0.00</h3>
+            <h6>Descontar $2.000 de apertura de caja.</h6>
+            <h4>Dinero fisico a entregar en sobre:</h4>
+            <input id="idMonto" th:field="*{monto}" type="number">
+            <button class="btn btn-success" type="submit">Cerrar Caja</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
