@@ -1,0 +1,38 @@
+<nav th:fragment="navbar" xmlns:th="http://www.w3.org/1999/xhtml"
+     class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" target="_blank" href="//google.com">Sistema de ventas</a>
+    <button class="navbar-toggler" type="button" id="botonMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/vender/}">Vender</a>
+            </li>
+            <li th:if="${role == 'ADMIN'}" class="nav-item">
+                <a class="nav-link" th:href="@{/productos/mostrar}">Stock de Productos Privados</a>
+            </li>
+            <li th:if="${role == 'VENDER'}" class="nav-item">
+                <a class="nav-link" th:href="@{/productospublicos/mostrar}">Stock de Productos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/ventaspublico/}">Mis Ventas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/cierrecajapublico/mostrar}">Cierre de Caja</a>
+            </li>
+            <li th:if="${role == 'ADMIN'}" class="nav-item">
+                <a class="nav-link" th:href="@{/ventas/}">Mis Estadisticas</a>
+            </li>
+        </ul>
+    </div>
+    <div style="margin-right: 10px; color: white;">
+                Usuario: <span th:text="${userName}"></span>
+    </div>
+
+    <form th:action="@{/logout}" method="get">
+        <button class="btn btn-md btn-danger btn-block" name="registration"
+                type="Submit">Cerrar sesión
+        </button>
+    </form>
+</nav>
