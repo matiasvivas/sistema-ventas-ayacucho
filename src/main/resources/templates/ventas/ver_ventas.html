@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="master">
+<body style="padding-top: 0px;">
+<main layout:fragment="contenido">
+
+    <div hidden id="estadisticasVentas" th:text="${estadisticasVentas}"></div>
+
+    <div class="col-12">
+        <h2>Estadisticas de Ventas</h2>
+    </div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+      var estadisticasVentas = document.getElementById("estadisticasVentas").innerHTML;
+      var venta = estadisticasVentas.split(";");
+      var ventaArray = new Array();
+      var todasLasVentas = new Array();
+      ventaArray.push("'Dia'");
+      ventaArray.push("'Monto'");
+      todasLasVentas.push("["+ventaArray+"]");
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Dia');
+      data.addColumn('number', 'Monto');
+
+      for(var i=0;i<venta.length;i++){
+        var ventaArrayInterno = new Array();
+        var fechaymonto = venta[i].split(",");
+        var fecha = fechaymonto[0];
+        var monto = fechaymonto[1];
+
+        data.addRow([fecha,parseFloat(monto)]);
+      }
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+
+
+
+
+
+
+    <div class="col-12">
+        <h2>Mis Ventas</h2>
+        <div th:classappend="'alert-' + (${clase != null} ? ${clase} : info)" th:if="${mensaje != null}"
+             th:text="${mensaje}"
+             class="alert">
+        </div>
+        <br>
+        <br>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Productos</th>
+                    <th>Usuario</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="venta : ${ventas}">
+                    <td th:text="${venta.fechaYHora}"></td>
+                    <td th:text="${venta.total}"></td>
+                    <td>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Código de barras</th>
+                                <th>Cantidad vendida</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="producto : ${venta.productos}">
+                                <td th:text="${producto.nombre}"></td>
+                                <td th:text="${producto.codigo}"></td>
+                                <td th:text="${producto.cantidad}"></td>
+                                <td th:text="${producto.precio}"></td>
+                                <td th:text="${producto.total}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td th:text="${venta.username}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</main>
+</body>
+</html>
